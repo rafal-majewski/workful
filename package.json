@@ -1,0 +1,19 @@
+{
+  "name": "workful",
+  "version": "0.0.0",
+  "description": "Node.js web framework",
+  "main": "main.js",
+  "scripts": {
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rafal-Majewski/workful.git"
+  },
+  "author": "Rafał Majewski",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/Rafal-Majewski/workful/issues"
+  },
+  "homepage": "https://github.com/Rafal-Majewski/workful#readme"
+}
