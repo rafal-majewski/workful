@@ -76,7 +76,7 @@ const getQueryAndFragment = (req) => {
 };
 
 const getDividedPath = (req) => {
-	const dividedPath = req.url == "/" ? [] : req.url.slice(1).split("/");
+	const dividedPath = req.url.match(/^[^?#]*/)[0].split("/").filter(Boolean);
 	req.getDividedPath = function () {
 		return dividedPath;
 	};
