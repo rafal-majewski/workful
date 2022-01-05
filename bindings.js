@@ -70,6 +70,13 @@ const getQueryAndFragment = (req) => {
 	req.getQuery = function () {
 		return query;
 	};
+	req.getQueryParam = function (name, defaultValue) {
+		if (!(name in query)) {
+			return defaultValue;
+		}
+		return query[name];
+	};
+
 	req.getFragment = function () {
 		return fragment;
 	};
