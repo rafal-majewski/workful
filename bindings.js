@@ -62,7 +62,7 @@ const getQueryAndFragment = (req) => {
 	} = (({rawQuery, rawFragment}) => ({
 		query: rawQuery === undefined ? null : rawQuery.split("&").reduce((query, rawKeyAndValue) => {
 			const {key, value} = rawKeyAndValue.match(/(?<key>[^=]*)(=(?<value>.*))?/).groups;
-			query[key] = value;
+			query[key] = value === undefined ? null : value;
 			return query;
 		}, {}),
 		fragment: rawFragment === undefined ? null : rawFragment,
