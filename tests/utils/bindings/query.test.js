@@ -92,3 +92,16 @@ test("rebuild query with overwrite", async () => {
 		server.close();
 	});
 });
+
+test("get query param with default value if no params", async () => {
+	const server = createServer((req, res) => {
+		bindings.query(req);
+		expect(req.getQueryParam("test", "c")).toBe("c");
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	await axios.get(`http://localhost:${server.address().port}`).finally(() => {
+		server.close();
+	});
+});

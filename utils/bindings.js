@@ -61,8 +61,7 @@ const body = (req) => {
 };
 
 const query = (req) => {
-	const rawQuery = req.url.match(/^[^?]*\?(.*)/)?.[1];
-	const query = rawQuery === undefined ? null : rawQuery;
+	const query = req.url.match(/^[^?]*\?(.*)/)?.[1] ?? null;
 	const queryParams = parseQuery(query);
 	req.getQuery = function () {
 		return query;
@@ -71,7 +70,7 @@ const query = (req) => {
 		return queryParams;
 	};
 	req.getQueryParam = function (name, defaultValue) {
-		if (!(name in queryParams)) {
+		if (!(name in (queryParams || {}))) {
 			return defaultValue;
 		}
 		return queryParams[name];
