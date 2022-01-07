@@ -1,32 +1,37 @@
-const symbols = require("./symbols.js");
+const symbols = require("./utils/symbols.js");
 const {
 	ANY_SUBROUTE,
 	PATH_PARAM_NAME,
+	MIDDLEWARE,
+	SUBROUTE_NOT_FOUND,
+	METHOD_NOT_ALLOWED,
+	INTERNAL_ERROR,
 } = symbols;
-const bindings = require("./bindings.js");
-const createApplyNotFound = require("./utils/createApplyNotFound.js");
-const createApplyMiddleware = require("./utils/createApplyMiddleware.js");
-const createApplyMethodNotAllowed = require("./utils/createApplyMethodNotAllowed.js");
-const createApplyInternalError = require("./utils/createApplyInternalError.js");
+const bindings = require("./utils/bindings.js");
+const applyCreators = require("./utils/applyCreators.js");
 
-const createServer = (router) => {
-	return require("http").createServer(async (req, res, errorCallback = (error, req, res) => (console.error(error))) => {
+
+const createServer = (router, callbacks = {}) => {
+	const {
+		startCallback = () => {},
+		errorCallback = (req, res, error) => (console.error(error)),
+	} = callbacks;
+	return require("http").createServer(async (req, res) => {
 		bindings.statusCode(res);
 		bindings.contentType(res);
-		bindings.endJson(res);
-		bindings.endText(res);
-		bindings.setCookie(res);
-		bindings.getBody(req);
-		bindings.getQueryAndFragment(req);
-		bindings.getDividedPath(req);
-		bindings.getHeaders(req);
-		bindings.getMiddlewarewareData(req);
-		bindings.getPathParams(req);
-
-		const applyMiddleware = createApplyMiddleware(req, res);
-		const applyNotFound = createApplyNotFound(req, res);
-		const applyMethodNotAllowed = createApplyMethodNotAllowed(req, res);
-		const applyInternalError = createApplyInternalError(req, res);
+		bindings.end(res);
+		bindings.cookie(res);
+		bindings.body(req);
+		bindings.query(req);
+		bindings.dividedPath(req);
+		bindings.headers(req);
+		bindings.middlewarewareData(req);
+		bindings.pathParams(req);
+		startCallback(req, res);
+		const applyMiddleware = applyCreators[MIDDLEWARE](req, res);
+		const applySubrouteNotFound = applyCreators[SUBROUTE_NOT_FOUND](req, res);
+		const applyMethodNotAllowed = applyCreators[METHOD_NOT_ALLOWED](req, res);
+		const applyInternalError = applyCreators[INTERNAL_ERROR](req, res);
 
 		let route = router;
 
@@ -38,7 +43,7 @@ const createServer = (router) => {
 				const subrouteName = dividedPath[i];
 				if (!route[subrouteName]) {
 					if (!route[ANY_SUBROUTE]) {
-						if (await applyNotFound(route)) return;
+						return await applySubrouteNotFound(route);
 					}
 					route = route[ANY_SUBROUTE];
 				} else {
@@ -50,12 +55,12 @@ const createServer = (router) => {
 				if (await applyMiddleware(route)) return;
 			}
 			if (!route[symbols[req.method]]) {
-				if (await applyMethodNotAllowed(route)) return;
+				return applyMethodNotAllowed(route);
 			}
-			await route[symbols[req.method]](req, res);
+			route[symbols[req.method]](req, res);
 		} catch (error) {
 			applyInternalError(route);
-			errorCallback(error, req, res);
+			errorCallback(req, res, error);
 		}
 	});
 };

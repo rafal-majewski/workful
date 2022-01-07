@@ -1,43 +1,46 @@
-const stringifyCookies = require("./utils/stringifyCookies.js");
+const stringifyCookies = require("./stringifyCookies.js");
 
 const statusCode = (res) => {
-	res.status = function (statusCode) {
+	res.setStatusCode = function (statusCode) {
 		this.statusCode = statusCode;
 		return this;
 	};
+	res.getStatusCode = function () {
+		return this.statusCode;
+	}
 };
 
 const contentType = (res) => {
-	res.contentType = function (contentType) {
+	res.setContentType = function (contentType) {
 		this.setHeader("Content-Type", contentType);
 		return this;
 	};
+	res.getContentType = function () {
+		return this.getHeader("Content-Type");
+	}
 };
 
-const endJson = (res) => {
+const end = (res) => {
 	res.endJson = function (obj) {
 		this.setHeader("Content-Type", "application/json");
 		return this.end(JSON.stringify(obj));
 	};
-};
-
-const endText = (res) => {
 	res.endText = function (text) {
 		this.setHeader("Content-Type", "text/plain");
 		return this.end(text);
 	};
 };
 
-const setCookie = (res) => {
+const cookie = (res) => {
 	const cookiesToSet = {};
-	res.cookie = function (name, value) {
+	res.setCookie = function (name, value) {
 		cookiesToSet[name] = value;
 		this.setHeader("Set-Cookie", stringifyCookies(cookiesToSet));
 		return this;
 	}
 };
 
-const getBody = (req) => {
+const body = (req) => {
 	req.getBody = function () {
 		const fetchingBody = new Promise((resolve, reject) => {
 			let rawBody = [];
@@ -55,41 +58,36 @@ const getBody = (req) => {
 	};
 };
 
-const getQueryAndFragment = (req) => {
-	const {
-		query,
-		fragment,	
-	} = (({rawQuery, rawFragment}) => ({
-		query: rawQuery === undefined ? null : rawQuery.split("&").reduce((query, rawKeyAndValue) => {
-			const {key, value} = rawKeyAndValue.match(/(?<key>[^=]*)(=(?<value>.*))?/).groups;
-			query[key] = value === undefined ? null : value;
-			return query;
-		}, {}),
-		fragment: rawFragment === undefined ? null : rawFragment,
-	}))(req.url.match(/^[^\?#]*(?:\?(?<rawQuery>[^#]*))?(?:#(?<rawFragment>.*))?$/).groups);
+const query = (req) => {
+	const rawQuery = req.url.match(/^[^?]*\?(.*)/)?.[1];
+	const query = rawQuery === undefined ? null : rawQuery;
+	const queryParams = rawQuery === undefined ? null : rawQuery.split("&").reduce((query, rawKeyAndValue) => {
+		const {key, value} = rawKeyAndValue.match(/(?<key>[^=]*)(=(?<value>.*))?/).groups;
+		query[key] = value === undefined ? null : value;
+		return query;
+	}, {});
 	req.getQuery = function () {
 		return query;
 	};
+	req.getQueryParams = function () {
+		return queryParams;
+	};
 	req.getQueryParam = function (name, defaultValue) {
-		if (!(name in query)) {
+		if (!(name in queryParams)) {
 			return defaultValue;
 		}
-		return query[name];
-	};
-
-	req.getFragment = function () {
-		return fragment;
+		return queryParams[name];
 	};
 };
 
-const getDividedPath = (req) => {
-	const dividedPath = req.url.match(/^[^?#]*/)[0].split("/").filter(Boolean);
+const dividedPath = (req) => {
+	const dividedPath = req.url.match(/^([^?]*)/)[1].split("/").filter(Boolean);
 	req.getDividedPath = function () {
 		return dividedPath;
 	};
 };
 
-const getPathParams = (req) => {
+const pathParams = (req) => {
 	const pathParams = {};
 	req.getPathParams = function () {
 		return pathParams;
@@ -99,7 +97,7 @@ const getPathParams = (req) => {
 	};
 };
 
-const getHeaders = (req) => {
+const headers = (req) => {
 	req.getHeaders = function () {
 		return req.headers;
 	};
@@ -108,23 +106,25 @@ const getHeaders = (req) => {
 	};
 };
 
-const getMiddlewarewareData = (req) => {
-	const middlewareData = {};
-	req.getMiddlewareData = function () {
-		return middlewareData;
+const middlewarewareData = (req) => {
+	const middlewaresData = {};
+	req.getMiddlewareData = function (name) {
+		return middlewaresData[name];
+	};
+	req.setMiddlewareData = function (name, value) {
+		middlewaresData[name] = value;
 	};
 };
 
 module.exports = {
 	statusCode,
 	contentType,
-	endJson,
-	endText,
-	setCookie,
-	getBody,
-	getQueryAndFragment,
-	getDividedPath,
-	getPathParams,
-	getHeaders,
-	getMiddlewarewareData,
+	end,
+	cookie,
+	body,
+	query,
+	dividedPath,
+	pathParams,
+	headers,
+	middlewarewareData,
 };

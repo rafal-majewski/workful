@@ -1,10 +1,10 @@
 {
   "name": "workful",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "Node.js web framework",
   "main": "main.js",
   "scripts": {
-
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/Rafal-Majewski/workful/issues"
   },
-  "homepage": "https://github.com/Rafal-Majewski/workful#readme"
+  "homepage": "https://github.com/Rafal-Majewski/workful#readme",
+  "devDependencies": {
+    "axios": "^0.24.0",
+    "eslint": "^8.6.0",
+    "jest": "^27.4.7"
+  }
 }
