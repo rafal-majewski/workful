@@ -66,3 +66,29 @@ test("get query param with default value", async () => {
 		server.close();
 	});
 });
+
+test("rebuild query without overwrite", async () => {
+	const server = createServer((req, res) => {
+		bindings.query(req);
+		expect(req.rebuildQuery({c: "d"})).toBe("a=b&c=d");
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	await axios.get(`http://localhost:${server.address().port}?a=b`).finally(() => {
+		server.close();
+	});
+});
+
+test("rebuild query with overwrite", async () => {
+	const server = createServer((req, res) => {
+		bindings.query(req);
+		expect(req.rebuildQuery({"test": "12"})).toBe("a=b&test=12");
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	await axios.get(`http://localhost:${server.address().port}?a=b&test=abc`).finally(() => {
+		server.close();
+	});
+});

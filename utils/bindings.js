@@ -1,4 +1,6 @@
 const stringifyCookies = require("./stringifyCookies.js");
+const stringifyQueryParams = require("./stringifyQueryParams.js");
+const parseQuery = require("./parseQuery.js");
 
 const statusCode = (res) => {
 	res.setStatusCode = function (statusCode) {
@@ -61,11 +63,7 @@ const body = (req) => {
 const query = (req) => {
 	const rawQuery = req.url.match(/^[^?]*\?(.*)/)?.[1];
 	const query = rawQuery === undefined ? null : rawQuery;
-	const queryParams = rawQuery === undefined ? null : rawQuery.split("&").reduce((query, rawKeyAndValue) => {
-		const {key, value} = rawKeyAndValue.match(/(?<key>[^=]*)(=(?<value>.*))?/).groups;
-		query[key] = value === undefined ? null : value;
-		return query;
-	}, {});
+	const queryParams = parseQuery(query);
 	req.getQuery = function () {
 		return query;
 	};
@@ -77,6 +75,9 @@ const query = (req) => {
 			return defaultValue;
 		}
 		return queryParams[name];
+	};
+	req.rebuildQuery = function (newQueryParams) {
+		return stringifyQueryParams({...queryParams, ...newQueryParams});
 	};
 };
 
