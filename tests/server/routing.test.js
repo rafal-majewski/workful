@@ -247,3 +247,15 @@ test("sub route request-ending middleware", async () => {
 		server.close();
 	});
 });
+
+test("status code of post on non-existing endpoint", async () => {
+	const server = createServer({
+		[GET]: () => {},
+	});
+	server.listen();
+	await axios.post(`http://localhost:${server.address().port}/tests`).catch((error) => {
+		expect(error.response.status).toBe(404);
+	}).finally(() => {
+		server.close();
+	});
+});
