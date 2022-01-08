@@ -23,7 +23,7 @@ const createServer = (router, callbacks = {}) => {
 		bindings.cookie(res);
 		bindings.body(req);
 		bindings.query(req);
-		bindings.dividedPath(req);
+		bindings.path(req);
 		bindings.headers(req);
 		bindings.middlewarewareData(req);
 		bindings.pathParams(req);

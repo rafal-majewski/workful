@@ -80,10 +80,13 @@ const query = (req) => {
 	};
 };
 
-const dividedPath = (req) => {
+const path = (req) => {
 	const dividedPath = req.url.match(/^([^?]*)/)[1].split("/").filter(Boolean);
 	req.getDividedPath = function () {
 		return dividedPath;
+	};
+	req.getPath = function () {
+		return "/" + dividedPath.join("/");
 	};
 };
 
@@ -123,7 +126,7 @@ module.exports = {
 	cookie,
 	body,
 	query,
-	dividedPath,
+	path,
 	pathParams,
 	headers,
 	middlewarewareData,
