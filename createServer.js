@@ -7,6 +7,7 @@ const {
 	METHOD_NOT_ALLOWED,
 	INTERNAL_ERROR,
 } = symbols;
+const methodsSymbols = ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH", "TRACE", "CONNECT"].map((method) => (symbols[method]));
 const bindings = require("./utils/bindings.js");
 const applyCreators = require("./utils/applyCreators.js");
 
@@ -55,7 +56,11 @@ const createServer = (router, callbacks = {}) => {
 				if (await applyMiddleware(route)) return;
 			}
 			if (!route[symbols[req.method]]) {
-				return applyMethodNotAllowed(route);
+				if (methodsSymbols.some((methodSymbol) => route[methodSymbol])) {
+					return await applyMethodNotAllowed(route);
+				} else {
+					return await applySubrouteNotFound(route);
+				}
 			}
 			route[symbols[req.method]](req, res);
 		} catch (error) {
