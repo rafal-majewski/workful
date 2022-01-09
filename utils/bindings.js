@@ -61,7 +61,8 @@ const body = (req) => {
 };
 
 const query = (req) => {
-	const query = req.url.match(/^[^?]*\?(.*)/)?.[1] ?? null;
+	const rawQuery = req.url.match(/^[^?]*\?(.*)/)?.[1]
+	const query = rawQuery == undefined ? null : decodeURIComponent(rawQuery);
 	const queryParams = parseQuery(query);
 	req.getQuery = function () {
 		return query;
@@ -81,7 +82,7 @@ const query = (req) => {
 };
 
 const path = (req) => {
-	const dividedPath = req.url.match(/^([^?]*)/)[1].split("/").filter(Boolean);
+	const dividedPath = req.url.match(/^([^?]*)/)[1].split("/").filter(Boolean).map(decodeURIComponent);
 	req.getDividedPath = function () {
 		return dividedPath;
 	};
