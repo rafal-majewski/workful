@@ -1,5 +1,4 @@
 # workful
-**DO NOT MEANT TO BE USED IN PRODUCTION ENVIRONMENT AS IT IS NOT FINISHED**
 Simple node.js web framework
 
 The framework works as an overlay to the standard http library createServer function,
