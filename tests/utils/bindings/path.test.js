@@ -53,3 +53,44 @@ test("/abc/def", () => {
 		server.close();
 	});
 });
+
+
+
+test("/abc///def", () => {
+	const server = createServer((req, res) => {
+		bindings.path(req);
+		expect(req.getPath()).toEqual("/abc/def");
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	axios.post(`http://localhost:${server.address().port}/abc///def`).finally(() => {
+		server.close();
+	});
+});
+
+test("/abc///def getDividedPath", () => {
+	const server = createServer((req, res) => {
+		bindings.path(req);
+		expect(req.getDividedPath()).toEqual(["abc", "def"]);
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	axios.post(`http://localhost:${server.address().port}/abc///def`).finally(() => {
+		server.close();
+	});
+});
+
+test("/ getDividedPath", () => {
+	const server = createServer((req, res) => {
+		bindings.path(req);
+		expect(req.getDividedPath()).toEqual([]);
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	axios.post(`http://localhost:${server.address().port}/`).finally(() => {
+		server.close();
+	});
+});

@@ -1,6 +1,5 @@
-const stringifyCookies = require("./stringifyCookies.js");
-const stringifyQueryParams = require("./stringifyQueryParams.js");
-const parseQuery = require("./parseQuery.js");
+const cookiesUtils = require("./cookiesUtils.js");
+const queryUtils = require("./queryUtils.js");
 
 const statusCode = (res) => {
 	res.setStatusCode = function (statusCode) {
@@ -34,10 +33,10 @@ const end = (res) => {
 };
 
 const cookie = (res) => {
-	const cookiesToSet = {};
 	res.setCookie = function (name, value) {
-		cookiesToSet[name] = value;
-		this.setHeader("Set-Cookie", stringifyCookies(cookiesToSet));
+		const cookies = cookiesUtils.unheaderify(res.getHeader("set-cookie") || []);
+		cookies[name] = value;
+		this.setHeader("set-cookie", cookiesUtils.headerify(cookies));
 		return this;
 	}
 };
@@ -61,23 +60,20 @@ const body = (req) => {
 };
 
 const query = (req) => {
-	const rawQuery = req.url.match(/^[^?]*\?(.*)/)?.[1]
-	const query = rawQuery == undefined ? null : decodeURIComponent(rawQuery);
-	const queryParams = parseQuery(query);
+	const rawQuery = req.url.match(/^[^?]*\?(.*)/)?.[1];
+	const query = rawQuery == undefined ? undefined : decodeURIComponent(rawQuery);
+	const queryParams = queryUtils.parse(query);
 	req.getQuery = function () {
 		return query;
 	};
 	req.getQueryParams = function () {
 		return queryParams;
 	};
-	req.getQueryParam = function (name, defaultValue) {
-		if (!(name in (queryParams || {}))) {
-			return defaultValue;
-		}
-		return queryParams[name];
+	req.getQueryParam = function (name) {
+		return queryParams?.[name];
 	};
 	req.rebuildQuery = function (newQueryParams) {
-		return stringifyQueryParams({...queryParams, ...newQueryParams});
+		return queryUtils.stringify({...queryParams, ...newQueryParams});
 	};
 };
 
@@ -99,6 +95,9 @@ const pathParams = (req) => {
 	req.getPathParam = function (name) {
 		return pathParams[name];
 	};
+	req.setPathParam = function (name, value) {
+		pathParams[name] = value;
+	};
 };
 
 const headers = (req) => {
@@ -107,16 +106,6 @@ const headers = (req) => {
 	};
 	req.getHeader = function (name) {
 		return req.headers[name];
-	};
-};
-
-const middlewarewareData = (req) => {
-	const middlewaresData = {};
-	req.getMiddlewareData = function (name) {
-		return middlewaresData[name];
-	};
-	req.setMiddlewareData = function (name, value) {
-		middlewaresData[name] = value;
 	};
 };
 
@@ -130,5 +119,4 @@ module.exports = {
 	path,
 	pathParams,
 	headers,
-	middlewarewareData,
 };

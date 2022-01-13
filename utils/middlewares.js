@@ -1,37 +1,33 @@
-const jsonParseBody = ({
-	wrongContentTypeErrorCallback = (req, res) => (res.end()),
-	jsonParseErrorCallback = (req, res) => (res.end()),
-}) => (
-	(req, res) => {
-		if (["GET", "HEAD"].includes(req.method)) {
-			return;
-		}
-		if (req.getHeader("content-type") != "application/json") {
-			res.status(415);
-			wrongContentTypeErrorCallback(req, res);
-			return;
-		}
-		return req.getBody().then((body) => {
-			const middlewareData = req.getMiddlewareData();
-			try {
-				middlewareData.jsonBody = JSON.parse(body);
-			} catch (error) {
-				res.status(400);
-				jsonParseErrorCallback(req, res);
-			}
-		});
-	}
-);
+const {
+	InvalidJsonBodyError,
+	InvalidContentTypeError,
+	NoBodyError,
+} = require("./errors.js");
 
-const combineMiddlewares = (...middlewares) => {
-	return async (req, res) => {
-		for (const middleware of middlewares) {
-			await middleware(req, res);
+const jsonBody = async (req, res, data) => {
+	if (["GET", "HEAD"].includes(req.method)) {
+		throw new NoBodyError("No body expected");
+	}
+	if (req.getHeader("content-type") != "application/json") {
+		throw new InvalidContentTypeError("Invalid content type");
+	}
+	return req.getBody().then((body) => {
+		let jsonBody;
+		try {
+			jsonBody = JSON.parse(body.toString());
+		} catch (error) {
+			throw new InvalidJsonBodyError("Invalid json body");
 		}
-	};
+		data.jsonBody = jsonBody;
+	});
 };
 
+const cors = (req, res) => {
+	res.setHeader("access-control-allow-origin", "*");
+};
+
+
 module.exports = {
-	jsonParseBody,
-	combineMiddlewares,
+	jsonBody,
+	cors,
 };
