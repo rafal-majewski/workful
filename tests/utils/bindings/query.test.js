@@ -5,7 +5,7 @@ const axios = require("axios");
 test("no query", async () => {
 	const server = createServer((req, res) => {
 		bindings.query(req);
-		expect(req.getQuery()).toBe(undefined);
+		expect(req.getQuery()).toBe(null);
 		res.statusCode = 200;
 		res.end();
 	});
@@ -98,6 +98,34 @@ test("get query param non-existing", async () => {
 	const server = createServer((req, res) => {
 		bindings.query(req);
 		expect(req.getQueryParam("test")).toBe(undefined);
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	await axios.get(`http://localhost:${server.address().port}`).finally(() => {
+		server.close();
+	});
+});
+
+
+test("get query param existing but null", async () => {
+	const server = createServer((req, res) => {
+		bindings.query(req);
+		expect(req.getQueryParam("test")).toBe(null);
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	await axios.get(`http://localhost:${server.address().port}?test`).finally(() => {
+		server.close();
+	});
+});
+
+
+test("get query params without query", async () => {
+	const server = createServer((req, res) => {
+		bindings.query(req);
+		expect(req.getQueryParams()).toEqual({});
 		res.statusCode = 200;
 		res.end();
 	});

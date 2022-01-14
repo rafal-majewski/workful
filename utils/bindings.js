@@ -61,8 +61,8 @@ const body = (req) => {
 
 const query = (req) => {
 	const rawQuery = req.url.match(/^[^?]*\?(.*)/)?.[1];
-	const query = rawQuery == undefined ? undefined : decodeURIComponent(rawQuery);
-	const queryParams = queryUtils.parse(query);
+	const query = rawQuery == undefined ? null : decodeURIComponent(rawQuery);
+	const queryParams = queryUtils.parse(query) || {};
 	req.getQuery = function () {
 		return query;
 	};
