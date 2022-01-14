@@ -79,7 +79,7 @@ const createServer = (router) => {
 						}
 						throw new NotFoundError(req.getPath);
 					}
-					return resolver(req, res, data, next);
+					return traverse(resolver, dividedPathTraversed, dividedPathToTraverse, data, next);
 				}
 				const resolver = route[dividedPathToTraverse[0]];
 				if (!resolver) {

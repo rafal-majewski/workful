@@ -149,3 +149,21 @@ test("multiple path params", (done) => {
 		server.close();
 	});
 });
+
+test("array of functions in GET", (done) => {
+	const server = createServer({
+		[GET]: [
+			(req, res) => {
+				res.setStatusCode(500);
+			},
+			(req, res) => {
+				res.end();
+				done();
+			},
+		],
+	});
+	server.listen();
+	axios.get(`http://localhost:${server.address().port}`).catch(() => {}).finally(() => {
+		server.close();
+	});
+});
