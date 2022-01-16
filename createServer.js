@@ -20,13 +20,11 @@ const rootErrorHandler = async (req, res, data, next) => {
 	} catch (err) {
 		if (res.writableEnded) return console.error(err);
 		res.setHeader("content-type", "text/plain");
-		if ([MethodNotAllowedError, NotFoundError, InvalidResolverError].some((ErrorClass) => (err instanceof ErrorClass))) {
-			res.setStatusCode(err.httpStatusCode);
-			res.end(err.message);
+		if ("httpStatusCode" in err) {
+			res.setStatusCode(err.httpStatusCode).end(err.message);
 		} else {
 			console.error(err);
-			res.setStatusCode(500);
-			res.end("Internal server error");
+			res.setStatusCode(500).end("Internal server error");
 		}
 	}
 };

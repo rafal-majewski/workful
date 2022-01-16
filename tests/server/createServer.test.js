@@ -193,3 +193,51 @@ test("InvalidResolveError", (done) => {
 		server.close();
 	});
 });
+
+
+test("InvalidResolveError (empty array)", (done) => {
+	const server = createServer([
+		async (req, res, data, next) => {
+			try {
+				await next();
+			} catch (error) {
+				if (error instanceof InvalidResolverError) {
+					done();
+				}
+				throw error;
+			}
+		},
+		[],
+	]);
+	server.listen();
+	axios.get(`http://localhost:${server.address().port}`).catch(() => {}).finally(() => {
+		server.close();
+	});
+});
+
+describe("spy console error", () => {
+	const original_console_error = console.error;
+	let spy_console_error;
+	beforeEach(() => {
+		console.error = jest.fn();
+	});
+	afterEach(() => {
+		console.error = original_console_error;
+	});
+
+	test("createServer with ending response and throwing error", async () => {
+		const server = createServer([
+			(req, res) => {
+				res.setStatusCode(200);
+				res.end();
+				throw new Error("Error");
+			},
+		]);
+		server.listen();
+		await axios.get(`http://localhost:${server.address().port}`).catch(() => {
+			expect(spy_console_error).toHaveBeenCalled();
+		}).finally(() => {
+			server.close();
+		});
+	});
+});
