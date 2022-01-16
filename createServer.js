@@ -77,7 +77,7 @@ const createServer = (router) => {
 						if (Object.values(methodsSymbols).some((methodSymbol) => route[methodSymbol])) {
 							throw new MethodNotAllowedError(`${req.method} ${req.getPath}`);
 						}
-						throw new NotFoundError(req.getPath);
+						throw new NotFoundError(req.getPath());
 					}
 					return traverse(resolver, dividedPathTraversed, dividedPathToTraverse, data, next);
 				}
