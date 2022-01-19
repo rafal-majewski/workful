@@ -32,13 +32,42 @@ const end = (res) => {
 	};
 };
 
-const cookie = (res) => {
-	res.setCookie = function (name, value) {
+
+
+const resCookie = (res) => {
+	const getCookies = () => {
 		const cookies = cookiesUtils.unheaderify(res.getHeader("set-cookie") || []);
+		return cookies;
+	};
+	res.setCookie = function (name, value) {
+		const cookies = getCookies();
 		cookies[name] = value;
 		this.setHeader("set-cookie", cookiesUtils.headerify(cookies));
 		return this;
-	}
+	};
+	res.getCookie = function (name) {
+		const cookies = getCookies();
+		return cookies[name];
+	};
+	res.getCookies = function () {
+		return getCookies();
+	};
+};
+
+const reqCookie = (req) => {
+	const getCookies = () => {
+		const cookies = cookiesUtils.unheaderify(req.headers.cookie?.split(";").map(
+			(headerifiedCookieWithoutSemicolon) => (headerifiedCookieWithoutSemicolon + ";")
+		) || []);
+		return cookies;
+	};
+	req.getCookie = function (name) {
+		const cookies = getCookies();
+		return cookies[name];
+	};
+	req.getCookies = function () {
+		return getCookies();
+	};
 };
 
 const body = (req) => {
@@ -113,7 +142,8 @@ module.exports = {
 	statusCode,
 	contentType,
 	end,
-	cookie,
+	reqCookie,
+	resCookie,
 	body,
 	query,
 	path,

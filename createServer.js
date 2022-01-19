@@ -38,7 +38,8 @@ const createServer = (router) => {
 		bindings.statusCode(res);
 		bindings.contentType(res);
 		bindings.end(res);
-		bindings.cookie(res);
+		bindings.reqCookie(req);
+		bindings.resCookie(res);
 		bindings.body(req);
 		bindings.query(req);
 		bindings.path(req);
