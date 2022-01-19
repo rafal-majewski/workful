@@ -45,8 +45,6 @@ const createServer = (router) => {
 		bindings.path(req);
 		bindings.headers(req);
 		bindings.pathParams(req);
-		// const dividedPath = ;
-		// const pathParams = req.getPathParams();
 
 	
 		const traverse = async (route, dividedPathTraversed, dividedPathToTraverse, data, next) => {
@@ -116,76 +114,6 @@ const createServer = (router) => {
 			{},
 			null
 		);
-		// const traverse = async (resolver, dividedPath) => {
-		// 	if (Array.isArray(resolver)) {
-		// 		for (const subresolver of resolver) {
-		// 			await traverse(subresolver, dividedPath);
-		// 		}
-		// 	}
-		// 	else if (typeof resolver === "function") {
-		// 		return await resolver(req, res, middlewarewareData);
-		// 	}
-		// 	else if (typeof resolver === "object") {
-		// 		if (dividedPath.length === 0) {
-		// 			const finalSubresolver = resolver[methodsSymbols[req.method]];
-		// 			if (!finalSubresolver) {
-		// 				if (Object.values(methodsSymbols).some((methodSymbol) => resolver[methodSymbol])) {
-		// 					throw new MethodNotAllowedError(`${req.method} ${req.getPath()}`);
-		// 				}
-		// 				throw new NotFoundError(req.getPath());
-		// 			}
-		// 			return await finalSubresolver(req, res, middlewarewareData);
-		// 		}
-		// 		const subrouteSubresolver = resolver[dividedPath[0]];
-		// 		if (!subrouteSubresolver) {
-		// 			const anySubrouteSubresolver = resolver[ANY_SUBROUTE];
-		// 			if (!anySubrouteSubresolver) {
-		// 				throw new NotFoundError(req.getPath());
-		// 			}
-		// 			const paramName = anySubrouteSubresolver[PATH_PARAM_NAME]
-		// 			if (paramName) {
-		// 				req.setPathParams(paramName, dividedPath[0]);
-		// 			}
-		// 			return await traverse(anySubrouteSubresolver, dividedPath.slice(1));
-		// 		}
-		// 		const paramName = subrouteSubresolver[PATH_PARAM_NAME]
-		// 		if (paramName) {
-		// 			req.setPathParams(paramName, dividedPath[0]);
-		// 		}
-		// 		return await traverse(subrouteSubresolver, dividedPath.slice(1));
-		// 	} else {
-		// 		throw new InvalidResolverError(resolver);
-		// 	}
-		// };
-		// await traverse(router, req.getDividedPath());
-		// try {
-		// 	if (await applyMiddleware(route)) return;
-		// 	for (let i = 0; i < dividedPath.length; ++i) {
-		// 		const subrouteName = dividedPath[i];
-		// 		if (!route[subrouteName]) {
-		// 			if (!route[ANY_SUBROUTE]) {
-		// 				return await applySubrouteNotFound(route);
-		// 			}
-		// 			route = route[ANY_SUBROUTE];
-		// 		} else {
-		// 			route = route[subrouteName];
-		// 		}
-		// 		if (route[PATH_PARAM_NAME]) {
-		// 			pathParams[route[PATH_PARAM_NAME]] = dividedPath[i];
-		// 		}
-		// 		if (await applyMiddleware(route)) return;
-		// 	}
-		// 	if (!route[symbols[req.method]]) {
-		// 		if (methodsSymbols.some((methodSymbol) => route[methodSymbol])) {
-		// 			return await applyMethodNotAllowed(route);
-		// 		} else {
-		// 			return await applySubrouteNotFound(route);
-		// 		}
-		// 	}
-		// 	route[symbols[req.method]](req, res);
-		// } catch (error) {
-		// 	applyInternalError(route);
-		// }
 	});
 };
 
