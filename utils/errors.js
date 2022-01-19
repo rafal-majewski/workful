@@ -53,6 +53,15 @@ class InvalidResolverError extends Error {
 	}
 }
 
+class YupValidationError extends Error {
+	constructor(yupError) {
+		super(yupError.message);
+		this.yupError = yupError;
+		this.name = "YupValidationError";
+		this.httpStatusCode = 400;
+	}
+}
+
 
 module.exports = {
 	InvalidContentTypeError,
@@ -62,4 +71,5 @@ module.exports = {
 	NotFoundError,
 	InvalidResolverError,
 	NoBodyError,
+	YupValidationError,
 };
