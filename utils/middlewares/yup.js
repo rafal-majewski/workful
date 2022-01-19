@@ -12,8 +12,9 @@ const yupValidate = (getData, setData) => (schema) => async (req, res, workfulDa
 	const data = await getData(req, res, workfulData);
 	let yupData;
 	try {
-		yupData = await schema.validate(data, schema);
+		yupData = await schema.validate(data);
 	} catch (error) {
+		console.log(error);
 		if (error.name === "ValidationError") throw new YupValidationError(error);
 		throw error;
 	}
@@ -21,6 +22,6 @@ const yupValidate = (getData, setData) => (schema) => async (req, res, workfulDa
 };
 
 module.exports = {
-	json: yupValidate(getJsonBody, setYupJsonBody),
-	query: yupValidate(getQueryParams, setYupQueryParams),
+	validateJsonBody: yupValidate(getJsonBody, setYupJsonBody),
+	validateQueryParams: yupValidate(getQueryParams, setYupQueryParams),
 };

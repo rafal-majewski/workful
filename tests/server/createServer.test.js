@@ -42,6 +42,19 @@ test("createServer with no params", async () => {
 	});
 });
 
+test("ending response without status code", async () => {
+	const server = createServer((req, res) => {
+		res.end();
+	});
+	server.listen();
+
+	await axios.get(`http://localhost:${server.address().port}`).catch((error) => {
+		expect(error.response.status).toBe(500);
+	}).finally(() => {
+		server.close();
+	});
+});
+
 
 test("createServer with function (timeout)", async () => {
 	const server = createServer(() => {});
@@ -236,6 +249,19 @@ describe("spy console error", () => {
 		server.listen();
 		await axios.get(`http://localhost:${server.address().port}`).catch(() => {
 			expect(spy_console_error).toHaveBeenCalled();
+		}).finally(() => {
+			server.close();
+		});
+	});
+	test("throwing error with invalid status code", async () => {
+		const server = createServer(() => {
+			const error = new Error("Error");
+			error.httpStatusCode = 32343;
+			throw error;
+		});
+		server.listen();
+		await axios.get(`http://localhost:${server.address().port}`).catch((error) => {
+			expect(error.response.status).toBe(500);
 		}).finally(() => {
 			server.close();
 		});

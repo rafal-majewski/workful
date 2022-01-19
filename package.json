@@ -1,6 +1,6 @@
 {
   "name": "workful",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Node.js web framework",
   "main": "main.js",
   "scripts": {
@@ -19,6 +19,7 @@
   "devDependencies": {
     "axios": "^0.24.0",
     "eslint": "^8.6.0",
-    "jest": "^27.4.7"
+    "jest": "^27.4.7",
+    "yup": "^0.32.11"
   }
 }

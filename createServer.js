@@ -1,10 +1,5 @@
 const methodsSymbols = require("./utils/methodsSymbols.js");
 
-// const {
-// 	ANY_SUBROUTE,
-// 	PATH_PARAM_NAME,
-// } = specialSymbols;
-
 const {
 	MethodNotAllowedError,
 	NotFoundError,
@@ -19,10 +14,13 @@ const rootErrorHandler = async (req, res, data, next) => {
 		await next();
 	} catch (err) {
 		if (res.writableEnded) return console.error(err);
-		res.setHeader("content-type", "text/plain");
-		if ("httpStatusCode" in err) {
-			res.setStatusCode(err.httpStatusCode).end(err.message);
-		} else {
+		try {
+			res.setHeader("content-type", "text/plain");
+			if ("httpStatusCode" in err) {
+				return res.setStatusCode(err.httpStatusCode).end(`${err.httpStatusCode} ${err.name}: ${err.message}`);
+			}
+			throw err;
+		} catch (err) {
 			console.error(err);
 			res.setStatusCode(500).end("Internal server error");
 		}
@@ -62,7 +60,7 @@ const createServer = (router) => {
 						traverse(route.slice(1), dividedPathTraversed, dividedPathToTraverse, data, next)
 					));
 				}
-				throw new InvalidResolverError(`${req.getPath()}`);
+				throw new InvalidResolverError(req.getPath());
 			}
 			if (typeof route === "function") {
 				return route(req, res, data, next);
@@ -104,7 +102,7 @@ const createServer = (router) => {
 				req.setPathParam(route, dividedPathTraversed[dividedPathTraversed.length - 1]);
 				return next();
 			}
-			throw new InvalidResolverError(`${req.getPath}`);
+			throw new InvalidResolverError(req.getPath());
 		};
 
 		traverse(
