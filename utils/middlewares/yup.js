@@ -14,7 +14,6 @@ const yupValidate = (getData, setData) => (schema) => async (req, res, workfulDa
 	try {
 		yupData = await schema.validate(data);
 	} catch (error) {
-		console.log(error);
 		if (error.name === "ValidationError") throw new YupValidationError(error);
 		throw error;
 	}
