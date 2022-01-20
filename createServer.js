@@ -70,7 +70,7 @@ const createServer = (router) => {
 					const resolver = route[methodsSymbols[req.method]];
 					if (!resolver) {
 						if (Object.values(methodsSymbols).some((methodSymbol) => route[methodSymbol])) {
-							throw new MethodNotAllowedError(`${req.method} ${req.getPath}`);
+							throw new MethodNotAllowedError(`${req.method} ${req.getPath()}`);
 						}
 						throw new NotFoundError(req.getPath());
 					}
