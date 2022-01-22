@@ -7,7 +7,7 @@ const headerify = (cookies) => (
 const unheaderify = (headerifiedCookies) => (
 	Object.fromEntries(
 		headerifiedCookies.map((headerifiedCookie) => (
-			headerifiedCookie.match(/^([^=]*)=(.*);$/)?.slice(1, 3)
+			headerifiedCookie.match(/^[\s,]*([^\s,=]*)=(.*);[\s,]*$/)?.slice(1, 3)
 		)).filter(Boolean)
 	)
 );
