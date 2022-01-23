@@ -1,25 +1,31 @@
 const headerify = (cookies) => (
-	Object.entries(cookies).map(([name, {value, options}]) => (
-		[`${name}=${value}`, ...Object.entries(options).map(([optionKey, optionValue]) => (
-			optionValue === null ? optionKey : `${optionKey}=${optionValue}`
-		))].join("; ")
+	Object.values(cookies).map(({name, value, options}) => (
+		[
+			`${name}=${value}`, ...Object.entries(options).filter(([, optionValue]) => (optionValue !== false)).map(([optionKey, optionValue]) => (
+				`${optionKey}${[true, null].includes(optionValue) ? "" : `=${optionValue}`}`
+			))
+		].join("; ")
 	))
 );
 
 const unheaderify = (headerifiedCookies) => (
 	Object.fromEntries(
 		headerifiedCookies.map((headerifiedCookie) => (
-			(([[name, value] = [], ...options]) => (
-				name && [name, {value, options: Object.fromEntries(options)}]
+			((
+				[[name, value], ...options]
+			) => (
+				[name, {name, value, options: Object.fromEntries(options)}]
 			))(
-				headerifiedCookie.split(";")
-				.map((cookiePart) => (cookiePart.replace(/^[\s,]+|[\s,]+$/g, "")))
-				.filter(Boolean)
-				.map((cookiePart) => (cookiePart.match(/^([^=]+)=(.*)$/)?.slice(1, 3) || [cookiePart, null]))
+				headerifiedCookie.split(";").map((cookiePart) => (
+					cookiePart.split("=")
+				)).map(([key, value]) => (
+					[key.trim(), value?.trim() ?? true]
+				))
 			)
-		)).filter(Boolean)
-	)
+		)
+	))
 );
+
 
 
 module.exports = {

@@ -35,7 +35,7 @@ test("getting cookie", async () => {
 	const server = createServer((req, res) => {
 		bindings.resCookie(res);
 		res.setCookie("hello", "world");
-		expect(res.getCookie("hello")).toEqual({value: "world", options: {}});
+		expect(res.getCookie("hello")).toEqual({name: "hello", value: "world", options: {}});
 		res.statusCode = 200;
 		res.end();
 	});
@@ -50,7 +50,10 @@ test("getting cookies", async () => {
 		bindings.resCookie(res);
 		res.setCookie("hello", "world");
 		res.setCookie("foo", "bar");
-		expect(res.getCookies()).toEqual({hello: {value: "world", options: {}}, foo: {value: "bar", options: {}}});
+		expect(res.getCookies()).toEqual({
+			hello: {name: "hello", value: "world", options: {}},
+			foo: {name: "foo", value: "bar", options: {}
+		}});
 		res.statusCode = 200;
 		res.end();
 	});
@@ -70,6 +73,21 @@ test("if sets correct header for 1 cookie with max age", async () => {
 	});
 	server.listen();
 	await axios.get(`http://localhost:${server.address().port}`).finally(() => {
+		server.close();
+	});
+});
+
+test("if axios gets correct cookie with max age", async () => {
+	const server = createServer((req, res) => {
+		bindings.resCookie(res);
+		res.setCookie("hello", "world", {["max-age"]: 1000});
+		res.statusCode = 200;
+		res.end();
+	});
+	server.listen();
+	await axios.get(`http://localhost:${server.address().port}`).then((response) => {
+		expect(response.headers["set-cookie"]).toEqual(["hello=world; max-age=1000"]);
+	}).finally(() => {
 		server.close();
 	});
 });

@@ -41,7 +41,7 @@ const resCookie = (res) => {
 	};
 	res.setCookie = function (name, value, options = {}) {
 		const cookies = getCookies();
-		cookies[name] = {value, options};
+		cookies[name] = {name, value, options};
 		this.setHeader("set-cookie", cookiesUtils.headerify(cookies));
 		return this;
 	};

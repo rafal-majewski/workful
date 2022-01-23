@@ -2,10 +2,11 @@ const bindings = require("../../../utils/bindings.js");
 const {createServer} = require("http");
 const axios = require("axios");
 
+
 test("getting existing cookie", async () => {
 	const server = createServer((req, res) => {
 		bindings.reqCookie(req);
-		expect(req.getCookie("hello")).toEqual({value: "world", options: {}});
+		expect(req.getCookie("hello")).toEqual({name: "hello", value: "world", options: {}});
 		res.statusCode = 200;
 		res.end();
 	});
@@ -45,8 +46,8 @@ test("getting cookies", async () => {
 	const server = createServer((req, res) => {
 		bindings.reqCookie(req);
 		expect(req.getCookies()).toEqual({
-			hello: {value: "world", options: {}},
-			test: {value: "abc", options: {}},
+			hello: {name: "hello", value: "world", options: {}},
+			test: {name: "test", value: "abc", options: {}},
 		});
 		res.statusCode = 200;
 		res.end();
