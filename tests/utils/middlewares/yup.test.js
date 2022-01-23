@@ -68,6 +68,7 @@ test("queryParams if raises validation error", (done) => {
 			} catch (error) {
 				expect(error).toBeInstanceOf(YupValidationError);
 				done();
+				res.setStatusCode(500).end();
 			}
 		},
 		middlewares.yup.validateQueryParams(queryParamsSchema),
