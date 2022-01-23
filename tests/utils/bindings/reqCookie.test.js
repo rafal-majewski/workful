@@ -5,7 +5,7 @@ const axios = require("axios");
 test("getting existing cookie", async () => {
 	const server = createServer((req, res) => {
 		bindings.reqCookie(req);
-		expect(req.getCookie("hello")).toEqual("world");
+		expect(req.getCookie("hello")).toEqual({value: "world", options: {}});
 		res.statusCode = 200;
 		res.end();
 	});
@@ -15,7 +15,7 @@ test("getting existing cookie", async () => {
 	});
 });
 
-test("getting nonexisting cookie", async () => {
+test("req getting nonexisting cookie", async () => {
 	const server = createServer((req, res) => {
 		bindings.reqCookie(req);
 		expect(req.getCookie("hello")).toEqual(undefined);
@@ -28,7 +28,7 @@ test("getting nonexisting cookie", async () => {
 	});
 });
 
-test("getting nonexisting cookie with no cookies", async () => {
+test("req getting nonexisting cookie with no cookies", async () => {
 	const server = createServer((req, res) => {
 		bindings.reqCookie(req);
 		expect(req.getCookie("hello")).toEqual(undefined);
@@ -44,7 +44,10 @@ test("getting nonexisting cookie with no cookies", async () => {
 test("getting cookies", async () => {
 	const server = createServer((req, res) => {
 		bindings.reqCookie(req);
-		expect(req.getCookies()).toEqual({hello: "world", test: "abc"});
+		expect(req.getCookies()).toEqual({
+			hello: {value: "world", options: {}},
+			test: {value: "abc", options: {}},
+		});
 		res.statusCode = 200;
 		res.end();
 	});

@@ -39,9 +39,9 @@ const resCookie = (res) => {
 		const cookies = cookiesUtils.unheaderify(res.getHeader("set-cookie") || []);
 		return cookies;
 	};
-	res.setCookie = function (name, value) {
+	res.setCookie = function (name, value, options = {}) {
 		const cookies = getCookies();
-		cookies[name] = value;
+		cookies[name] = {value, options};
 		this.setHeader("set-cookie", cookiesUtils.headerify(cookies));
 		return this;
 	};
@@ -56,9 +56,7 @@ const resCookie = (res) => {
 
 const reqCookie = (req) => {
 	const getCookies = () => {
-		const cookies = cookiesUtils.unheaderify(req.headers.cookie?.split(";").map(
-			(headerifiedCookieWithoutSemicolon) => (headerifiedCookieWithoutSemicolon + ";")
-		) || []);
+		const cookies = cookiesUtils.unheaderify(req.headers.cookie?.split(";") || []);
 		return cookies;
 	};
 	req.getCookie = function (name) {
