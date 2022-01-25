@@ -67,12 +67,18 @@ const createServer = (router) => {
 			}
 			if (typeof route === "object") {
 				if (dividedPathToTraverse.length === 0) {
-					const resolver = route[methodsSymbols[req.method]];
+					const resolver = route[req.method === "HEAD" ? "GET" : methodsSymbols[req.method]];
 					if (!resolver) {
 						if (Object.values(methodsSymbols).some((methodSymbol) => route[methodSymbol])) {
 							throw new MethodNotAllowedError(`${req.method} ${req.getPath()}`);
 						}
 						throw new NotFoundError(req.getPath());
+					}
+					if (req.method === "HEAD") {
+						const original_end = res.end;
+						res.end = function() {
+							original_end.apply(this)
+						}
 					}
 					return traverse(resolver, dividedPathTraversed, dividedPathToTraverse, data, next);
 				}
