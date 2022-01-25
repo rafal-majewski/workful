@@ -62,6 +62,14 @@ class YupValidationError extends Error {
 	}
 }
 
+class InternalError extends Error {
+	constructor(message) {
+		super(message);
+		this.name = "InternalError";
+		this.httpStatusCode = 500;
+	}
+}
+
 
 module.exports = {
 	InvalidContentTypeError,
@@ -72,4 +80,5 @@ module.exports = {
 	InvalidResolverError,
 	NoBodyError,
 	YupValidationError,
+	InternalError,
 };
