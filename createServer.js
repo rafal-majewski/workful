@@ -68,8 +68,9 @@ const createServer = (router) => {
 			if (typeof route === "object") {
 				if (dividedPathToTraverse.length === 0) {
 					if (req.method === "OPTIONS") {
+						// something wrong here 
 						const allowedMethods = Object.keys(route).reduce((allowedMethods, routeKey) => {
-							if (typeof route[routeKey] === "symbol") {
+							if (typeof routeKey === "symbol") {
 								const method = routeKey.description;
 								allowedMethods.push(method);
 								if (method === "GET") allowedMethods.push("HEAD");
@@ -77,7 +78,7 @@ const createServer = (router) => {
 							return allowedMethods;
 						}, []);
 						if (allowedMethods.length === 0) {
-							throw new MethodNotAllowedError(req.getPath());
+							throw new NotFoundError(req.getPath());
 						}
 						if (req.getHeader("access-control-request-method")) {
 							return res.setStatusCode(204).setHeader("access-control-allow-methods", methodsSymbols.join(", ")).end();
