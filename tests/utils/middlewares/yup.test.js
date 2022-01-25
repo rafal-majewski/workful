@@ -117,28 +117,38 @@ test("other error", (done) => {
 });
 
 
-
-test("other error if response 500", async () => {
-	const queryParamsSchema = yup.object().shape({
-		"test": yup.number().required().test("test", "test", () => {
-			throw new Error("test");
-		}),
+describe("quiet console.error", () => {
+	const original_console_error = console.error;
+	beforeEach(() => {
+		console.error = () => {};
 	});
 
-	const server = createServer([
-		middlewares.yup.validateQueryParams(queryParamsSchema),
-		{
-			[GET]: (req, res) => {
-				res.setStatusCode(200).end();
-			},
-		},
-	]);
+	afterEach(() => {
+		console.error = original_console_error;
+	});
 
-	server.listen();
-	await axios.get(`http://localhost:${server.address().port}?test=123`).catch((error) => {
-		expect(error.response.status).toBe(500);
-	}).finally(() => {
-		server.close();
+	test("other error if response 500", async () => {
+		const queryParamsSchema = yup.object().shape({
+			"test": yup.number().required().test("test", "test", () => {
+				throw new Error("test");
+			}),
+		});
+
+		const server = createServer([
+			middlewares.yup.validateQueryParams(queryParamsSchema),
+			{
+				[GET]: (req, res) => {
+					res.setStatusCode(200).end();
+				},
+			},
+		]);
+
+		server.listen();
+		await axios.get(`http://localhost:${server.address().port}?test=123`).catch((error) => {
+			expect(error.response.status).toBe(500);
+		}).finally(() => {
+			server.close();
+		});
 	});
 });
 
