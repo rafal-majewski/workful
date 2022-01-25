@@ -76,7 +76,8 @@ const createServer = (router) => {
 					}
 					if (req.method === "HEAD") {
 						const original_end = res.end;
-						res.end = function() {
+						res.end = function(content) {
+							this.setHeader("content-length", content.length);
 							original_end.apply(this)
 						}
 					}
