@@ -67,7 +67,7 @@ const createServer = (router) => {
 			}
 			if (typeof route === "object") {
 				if (dividedPathToTraverse.length === 0) {
-					const resolver = route[req.method === "HEAD" ? "GET" : methodsSymbols[req.method]];
+					const resolver = route[methodsSymbols[req.method === "HEAD" ? "GET" : req.method]];
 					if (!resolver) {
 						if (Object.values(methodsSymbols).some((methodSymbol) => route[methodSymbol])) {
 							throw new MethodNotAllowedError(`${req.method} ${req.getPath()}`);
