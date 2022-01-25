@@ -80,7 +80,10 @@ const createServer = (router) => {
 							throw new NotFoundError(req.getPath());
 						}
 						if (req.getHeader("access-control-request-method")) {
-							return res.setStatusCode(204).setHeader("access-control-allow-methods", allowedMethods.join(", ")).end();
+							return res.setStatusCode(204).setHeader(
+								"access-control-allow-headers",
+								"content-type",
+							).setHeader("access-control-allow-methods", allowedMethods.join(", ")).end();
 						} else {
 							return res.setStatusCode(204).setHeader("allow", allowedMethods.join(", ")).end();
 						}
