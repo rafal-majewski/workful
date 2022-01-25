@@ -96,6 +96,7 @@ const createServer = (router) => {
 						const original_end = res.end;
 						res.end = function(content) {
 							this.setHeader("content-length", content.length);
+							this.setStatusCode(204);
 							original_end.apply(this)
 						}
 					}
