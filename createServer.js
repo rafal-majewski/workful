@@ -67,6 +67,24 @@ const createServer = (router) => {
 			}
 			if (typeof route === "object") {
 				if (dividedPathToTraverse.length === 0) {
+					if (req.method === "OPTIONS") {
+						const allowedMethods = Object.keys(route).reduce((allowedMethods, routeKey) => {
+							if (typeof route[routeKey] === "symbol") {
+								const method = routeKey.description;
+								allowedMethods.push(method);
+								if (method === "GET") allowedMethods.push("HEAD");
+							}
+							return allowedMethods;
+						}, []);
+						if (allowedMethods.length === 0) {
+							throw new MethodNotAllowedError(req.getPath());
+						}
+						if (req.getHeader("access-control-request-method")) {
+							return res.setStatusCode(204).setHeader("access-control-allow-methods", methodsSymbols.join(", ")).end();
+						} else {
+							return res.setStatusCode(204).setHeader("allow", methodsSymbols.join(", ")).end();
+						}
+					}
 					const resolver = route[methodsSymbols[req.method === "HEAD" ? "GET" : req.method]];
 					if (!resolver) {
 						if (Object.values(methodsSymbols).some((methodSymbol) => route[methodSymbol])) {
