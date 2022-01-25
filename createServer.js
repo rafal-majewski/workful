@@ -68,22 +68,21 @@ const createServer = (router) => {
 			if (typeof route === "object") {
 				if (dividedPathToTraverse.length === 0) {
 					if (req.method === "OPTIONS") {
-						// something wrong here 
-						const allowedMethods = Object.keys(route).reduce((allowedMethods, routeKey) => {
+						const allowedMethods = Reflect.ownKeys(route).reduce((allowedMethods, routeKey) => {
 							if (typeof routeKey === "symbol") {
 								const method = routeKey.description;
 								allowedMethods.push(method);
 								if (method === "GET") allowedMethods.push("HEAD");
 							}
 							return allowedMethods;
-						}, []);
-						if (allowedMethods.length === 0) {
+						}, ["OPTIONS"]);
+						if (allowedMethods.length <= 1) {
 							throw new NotFoundError(req.getPath());
 						}
 						if (req.getHeader("access-control-request-method")) {
-							return res.setStatusCode(204).setHeader("access-control-allow-methods", methodsSymbols.join(", ")).end();
+							return res.setStatusCode(204).setHeader("access-control-allow-methods", allowedMethods.join(", ")).end();
 						} else {
-							return res.setStatusCode(204).setHeader("allow", methodsSymbols.join(", ")).end();
+							return res.setStatusCode(204).setHeader("allow", allowedMethods.join(", ")).end();
 						}
 					}
 					const resolver = route[methodsSymbols[req.method === "HEAD" ? "GET" : req.method]];

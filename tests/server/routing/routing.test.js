@@ -1,7 +1,7 @@
 const createServer = require("../../../createServer.js");
 const axios = require("axios");
 const {
-	GET,
+	GET, POST,
 } = require("../../../utils/methodsSymbols.js");
 const {
 	MethodNotAllowedError
@@ -164,6 +164,23 @@ test("array of functions in GET", (done) => {
 	});
 	server.listen();
 	axios.get(`http://localhost:${server.address().port}`).catch(() => {}).finally(() => {
+		server.close();
+	});
+});
+
+test("OPTIONS", async () => {
+	const server = createServer({
+		[GET]: (req, res) => {
+			res.setStatusCode(200).end();
+		},
+		[POST]: (req, res) => {
+			res.setStatusCode(200).end();
+		},
+	});
+	server.listen();
+	await axios.options(`http://localhost:${server.address().port}`).then((response) => {
+		expect(new Set(response.headers["allow"].split(", "))).toEqual(new Set(["OPTIONS", "HEAD", "GET", "POST"]));
+	}).finally(() => {
 		server.close();
 	});
 });
