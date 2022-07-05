@@ -1,6 +1,6 @@
 {
   "name": "workful",
-  "version": "2.3.9",
+  "version": "2.3.10",
   "description": "Node.js web framework",
   "main": "main.js",
   "scripts": {
